@@ -16,11 +16,13 @@ class DatosHardware(BaseModel):
 def predecir_throttling(datos: DatosHardware):
     # El modelo espera una lista de listas: [[temp, carga]]
     entrada = [[datos.temperatura, datos.carga_porcentaje]]
-    
+
     # Hacemos la predicción (devuelve un array de numpy, tomamos el primer valor)
     prediccion = int(modelo.predict(entrada)[0])
-    
+    probabilidad_throttling = float(modelo.predict_proba(entrada)[0][1])
+
     return {
         "thermal_throttling": bool(prediccion),
+        "probabilidad_riesgo": round(probabilidad_throttling * 100, 2),
         "estado": "PELIGRO: Bajando frecuencias" if prediccion == 1 else "Operación normal"
     }
